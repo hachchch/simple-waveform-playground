@@ -21,21 +21,23 @@ console.log(playWave);*/
 
 let valueSin=wave.value.replaceAll("sin","sin+").length-wave.value.length;
 let valueCos=wave.value.replaceAll("cos","cos+").length-wave.value.length;
-
+let inputedWave=wave.value;
 const imag = new Float32Array(10);
 const real = new Float32Array(10);
-for(let i = 0; i < 10; ++i){
+for(let i = 1; i < 10; ++i){
 	real[i] = imag[i] = 0;
 if(valueSin>=i){
-    if(wave.value[wave.value.indexOf("sin")-1]!="" && wave.value.indexOf("sin")-1!=-1 /*wave.value[wave.value.indexOf("sin")-1]!="+"*/){
-        imag[i]=1;//wave.value[wave.value.indexOf("sin")-1];
-        console.log(imag[i]);
+    if(inputedWave[inputedWave.indexOf("sin")-1]!="" && inputedWave[inputedWave.indexOf("sin")-1]!="+" && inputedWave.indexOf("sin")-1!=-1){
+        imag[i]=eval(inputedWave[inputedWave.indexOf("sin")-1]);
         }else{
         imag[i]=1;
         }
-    wave.value=wave.value.replace("sin","");
+    inputedWave=inputedWave.replace("sin","");
     }
 }
+
+console.log(imag[0]);
+console.log(imag[1]);
 
 const periodicWave=audioCtx.createPeriodicWave(real, imag);
 
@@ -43,8 +45,5 @@ oscillator.setPeriodicWave(periodicWave);
 oscillator.frequency.setValueAtTime(Hz*(2**(oct)), audioCtx.currentTime); // ヘルツ単位の値
 oscillator.connect(audioCtx.destination);
 oscillator.start();
-    console.log(seed);
-    if(seed!=thisSeed){
-        oscillator.stop();
-        }
+oscillator.stop(0.5);
 }
