@@ -5,22 +5,36 @@
     </head>
     <body>
         12音階
-        <input type="button" value="C" onclick="play(260.7)" />
-        <input type="button" value="C#" onclick="play((260.7)*(2**(1/12)))" />
-        <input type="button" value="D" onclick="play((260.7)*(2**(2/12)))" />
-        <input type="button" value="D#" onclick="play((260.7)*(2**(3/12)))" />
-        <input type="button" value="E" onclick="play((260.7)*(2**(4/12)))" />
-        <input type="button" value="F" onclick="play((260.7)*(2**(5/12)))" />
-        <input type="button" value="F#" onclick="play((260.7)*(2**(6/12)))" />
-        <input type="button" value="G" onclick="play((260.7)*(2**(7/12)))" />
-        <input type="button" value="G#" onclick="play((260.7)*(2**(8/12)))" />
-        <input type="button" value="A" onclick="play((260.7)*(2**(9/12)))" />
-        <input type="button" value="A#" onclick="play((260.7)*(2**(10/12)))" />
-        <input type="button" value="B" onclick="play((260.7)*(2**(11/12)))" />
-        オクターブ<input type="button" value="+1" onclick="oct++;" />
-        <input type="button" value="-1" onclick="oct--;" /><br>
+        <input type="button" value="4C" onclick="play(260.7)" id="C" />
+        <input type="button" value="4C#" onclick="play((260.7)*(2**(1/12)))" id="C#" />
+        <input type="button" value="4D" onclick="play((260.7)*(2**(2/12)))" id="D" />
+        <input type="button" value="4D#" onclick="play((260.7)*(2**(3/12)))" id="D#" />
+        <input type="button" value="4E" onclick="play((260.7)*(2**(4/12)))" id="E" />
+        <input type="button" value="4F" onclick="play((260.7)*(2**(5/12)))" id="F" />
+        <input type="button" value="4F#" onclick="play((260.7)*(2**(6/12)))" id="F#" />
+        <input type="button" value="4G" onclick="play((260.7)*(2**(7/12)))" id="G" />
+        <input type="button" value="4G#" onclick="play((260.7)*(2**(8/12)))" id="G#" />
+        <input type="button" value="4A" onclick="play((260.7)*(2**(9/12)))" id="A" />
+        <input type="button" value="4A#" onclick="play((260.7)*(2**(10/12)))" id="A#" />
+        <input type="button" value="4B" onclick="play((260.7)*(2**(11/12)))" id="B" />
+        オクターブ<input type="button" value="+1" onclick="oct++; inputNumber();" />
+        <input type="button" value="-1" onclick="oct--; inputNumber();" /><br>
         周波数を入力する。<input type="number" id="frequencyInput" oninput="inputNumber();" value="440" /><br><input type="button" onclick="play(yourFrequency.value)" id="yourButton" value="440Hz" /><br>
-        波形<input type="text" id="waveInput" value="sin(wt)" />
+        波形<input type="text" id="waveInput" value="sin(wt)" /><br>
+        <hr>
+        級数で入力する<br>
+        <input type="text" id="waveInput2" placeholder="∑[i=1→n](入力された式)" />
+        n=<input type="text" id="makeWaveTo" value="25" /><br>
+        <input type="button" value="nまでの数列式を波形に変換する。" onclick="letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value)" /><br>
+        <hr>
+        特殊な設定<br>
+        再生中に周波数を増加させる。<input type="text" placeholder="例(0.5*t)" id="movement" />
+        <hr>
+        プリセット<br>
+        
+        <input type="button" value="サイン波" onclick="document.getElementById('waveInput2').value='sin((1)wt)/(1)'; letsConvert(document.getElementById('waveInput2').value,1);" />
+        <input type="button" value="矩形波" onclick="document.getElementById('waveInput2').value='sin((2*i-1)wt)/(2*i-1)'; letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value);" />
+        <input type="button" value="三角波" onclick="document.getElementById('waveInput2').value='sin((2*i-1)wt)/((2*i-1)**2)*((-1)**(i-1))';letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value);" />
         <script type="text/javascript" src="./oscillator.js"></script>
     </body>
 </html>
