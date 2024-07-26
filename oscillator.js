@@ -1,21 +1,93 @@
 const yourButton = document.getElementById("yourButton");
 const yourFrequency = document.getElementById("frequencyInput");
+const movement = document.getElementById("movement");
 const wave = document.getElementById("waveInput");
+const c = document.getElementById("C");
+const cs = document.getElementById("C#");
+const d = document.getElementById("D");
+const ds = document.getElementById("D#");
+const e = document.getElementById("E");
+const f = document.getElementById("F");
+const fs = document.getElementById("F#");
+const g = document.getElementById("G");
+const gs = document.getElementById("G#");
+const a = document.getElementById("A");
+const as = document.getElementById("A#");
+const b = document.getElementById("B");
 var seed=0;
 let oct=0;
+let maxIndex=100;
+
+function checkValue(str,value,type,modStr){
+    let loop=1;
+    let strArray=[];
+    if(type=="-"){
+    while(str[str.indexOf(value)-loop]=="1" || str[str.indexOf(value)-loop]=="2" || str[str.indexOf(value)-loop]=="3" || str[str.indexOf(value)-loop]=="4" || str[str.indexOf(value)-loop]=="5" || str[str.indexOf(value)-loop]=="6" || str[str.indexOf(value)-loop]=="7" || str[str.indexOf(value)-loop]=="8" || str[str.indexOf(value)-loop]=="9" || str[str.indexOf(value)-loop]=="0" || str[str.indexOf(value)-loop]=="-" || str[str.indexOf(value)-loop]=="+" || str[str.indexOf(value)-loop]=="*" || str[str.indexOf(value)-loop]=="/" || str[str.indexOf(value)-loop]=="(" || str[str.indexOf(value)-loop]==")" || str[str.indexOf(value)-loop]==modStr){
+        strArray.push(str[str.indexOf(value)-loop]);
+        loop++;
+        }
+        strArray=strArray.reverse();
+        }else{
+        loop=-2;
+        while(str[str.indexOf(value)-loop]=="1" || str[str.indexOf(value)-loop]=="2" || str[str.indexOf(value)-loop]=="3" || str[str.indexOf(value)-loop]=="4" || str[str.indexOf(value)-loop]=="5" || str[str.indexOf(value)-loop]=="6" || str[str.indexOf(value)-loop]=="7" || str[str.indexOf(value)-loop]=="8" || str[str.indexOf(value)-loop]=="9" || str[str.indexOf(value)-loop]=="0" || str[str.indexOf(value)-loop]=="-" || str[str.indexOf(value)-loop]=="+" || str[str.indexOf(value)-loop]=="*" || str[str.indexOf(value)-loop]=="/" || str[str.indexOf(value)-loop]=="(" || str[str.indexOf(value)-loop]==")" || str[str.indexOf(value)-loop]==modStr){
+        strArray.push(str[str.indexOf(value)-loop]);
+        loop--;
+        }
+        }
+    str=strArray.join();
+    while(str.replaceAll("(","").length!=str.replaceAll(")","").length){
+        if(str.replaceAll("(","").length<str.replaceAll(")","").length){
+            str=str+")";
+            }else{
+            str="("+str;
+            }
+        }
+    return str.replaceAll(",","");
+    }
 
 function inputNumber(){
-    yourButton.value=yourFrequency.value+"Hz";
+    yourButton.value=yourFrequency.value*(2**(oct))+"Hz";
+    c.value=parseInt(oct+4)+"C";
+    cs.value=parseInt(oct+4)+"C#";
+    d.value=parseInt(oct+4)+"D";
+    ds.value=parseInt(oct+4)+"D#";
+    e.value=parseInt(oct+4)+"E";
+    f.value=parseInt(oct+4)+"F";
+    fs.value=parseInt(oct+4)+"F#";
+    g.value=parseInt(oct+4)+"G";
+    gs.value=parseInt(oct+4)+"G#";
+    a.value=parseInt(oct+4)+"A";
+    as.value=parseInt(oct+4)+"A#";
+    b.value=parseInt(oct+4)+"B";
+}
+
+function letsConvert(math,n){
+    wave.value="@";
+    math=math.replaceAll("wt","");
+    math=math.replaceAll("sin","");
+    let math1=checkValue(math,")/(","-","i");
+    //math1.replaceAll("i","*i")
+    let math2=checkValue(math,")/(","+","i");
+    for(let i=1; i<=n; i++){
+    wave.value=wave.value+"+"+"1/"+eval(eval(math2).toFixed(14))+"sin("+eval(eval(math1).toFixed(14))+"wt)";
+    }
+    wave.value=wave.value.replaceAll("1wt","wt");
+    wave.value=wave.value.replace("1sin","sin");
+    wave.value=wave.value.replaceAll("1/-","-1/");
+     wave.value=wave.value.replaceAll("+-","-");
+    wave.value=wave.value.replaceAll("1/sin","sin");
+    wave.value=wave.value.replaceAll("@+","");
+    wave.value=wave.value.replaceAll("@","");
 }
 
 function frequencyTest(inputedWave){
-    if(inputedWave[inputedWave.indexOf("wt")-1]=="(" || inputedWave.indexOf("wt")-1==inputedWave.indexOf("sin")+2){
+    if(inputedWave[inputedWave.indexOf("wt")-1]=="(" || inputedWave.indexOf("wt")-1==inputedWave.indexOf("sin")+2 || inputedWave.indexOf("wt")-1==inputedWave.indexOf("cos")+2){
         return 1;
         }else{
             let i3=1;
             let i3Coefficient="";
             let i3Array=[];
-            while(inputedWave[inputedWave.indexOf("wt")-i3]!="(" && inputedWave.indexOf("wt")-i3!=inputedWave.indexOf("sin")+2 && inputedWave.indexOf("wt")-i3!=-1){
+            while(inputedWave[inputedWave.indexOf("wt")-i3]!="(" && inputedWave.indexOf("wt")-i3!=inputedWave.indexOf("sin")+2 && inputedWave.indexOf("wt")-i3!=inputedWave.indexOf("sin")+2 && inputedWave.indexOf("wt")-i3!=-1){
                 i3Array.push(inputedWave[inputedWave.indexOf("wt")-i3]);//sin(2wt)
                 i3=i3+1;
                 }
@@ -25,54 +97,79 @@ function frequencyTest(inputedWave){
                 return eval(i3Coefficient);
             }
 }
-
 function play(Hz){
-    seed=Math.random()*999999;
-    let thisSeed=seed;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const oscillator = audioCtx.createOscillator();
 //ユーザーが入力する値はフーリエ級数、i倍音の振幅数の大きさなどを読み取る。
 let valueSin=wave.value.replaceAll("sin","sin+").length-wave.value.length;
 let valueCos=wave.value.replaceAll("cos","cos+").length-wave.value.length;
 let inputedWave=wave.value;
-let frequencyAddition = new Float32Array(10);
-const imag = new Float32Array(10);
-const real = new Float32Array(10);
-for(let i4=1; i4<10; ++i4){
+let frequencyAddition = new Float32Array(maxIndex);
+const imag = new Float32Array(maxIndex);
+const real = new Float32Array(maxIndex);
+for(let i4=1; i4<maxIndex; ++i4){
 real[i4] = imag[i4] = 0;
 }
-for(let i = 1; i < 10; ++i){
-if(valueSin>=i){
+for(let i = 1; i < maxIndex; ++i){
+if(valueSin+valueCos>=i){
+    if(inputedWave.indexOf("cos")>inputedWave.indexOf("sin") || inputedWave.indexOf("cos")==-1){
     if(inputedWave[inputedWave.indexOf("sin")-1]!="" && inputedWave[inputedWave.indexOf("sin")-1]!="+" && inputedWave[inputedWave.indexOf("sin")-1]!="-" && inputedWave.indexOf("sin")-1!=-1){
         let iCoefficient="";
         let iArray=[];
-        for(let i2 = 1; i2 < 10; ++i2){
+        for(let i2 = 1; i2 < 20; ++i2){
             if(inputedWave[inputedWave.indexOf("sin")-i2]!=")" && inputedWave[inputedWave.indexOf("sin")-i2]!="t" && inputedWave.indexOf("sin")-i2!=-1){
         iArray.push(inputedWave[inputedWave.indexOf("sin")-i2]);
                 }else{
                 iArray=iArray.reverse();
                 iCoefficient=iArray.join();
                 iCoefficient=iCoefficient.replaceAll(",","");
-                i2=10;
+                i2=20;
                 
                 frequencyAddition[i]=frequencyTest(inputedWave);
+                inputedWave=inputedWave.replace("wt","");
         imag[frequencyAddition[i]]=imag[frequencyAddition[i]]+eval(iCoefficient);
         }
             }
             }else{
         frequencyAddition[i]=frequencyTest(inputedWave);
+        inputedWave=inputedWave.replace("wt","");
         imag[frequencyAddition[i]]=imag[frequencyAddition[i]]+1;
         }
     inputedWave=inputedWave.replace("sin","");
+            }else if(inputedWave.indexOf("cos")<inputedWave.indexOf("sin") || inputedWave.indexOf("sin")==-1){
+        //余弦の計算
+        if(inputedWave[inputedWave.indexOf("cos")-1]!="" && inputedWave[inputedWave.indexOf("cos")-1]!="+" && inputedWave[inputedWave.indexOf("cos")-1]!="-" && inputedWave.indexOf("cos")-1!=-1){
+        let iCoefficient="";
+        let iArray=[];
+        for(let i2 = 1; i2 < 20; ++i2){
+            if(inputedWave[inputedWave.indexOf("cos")-i2]!=")" && inputedWave[inputedWave.indexOf("cos")-i2]!="t" && inputedWave.indexOf("cos")-i2!=-1){
+        iArray.push(inputedWave[inputedWave.indexOf("cos")-i2]);
+                }else{
+                iArray=iArray.reverse();
+                iCoefficient=iArray.join();
+                iCoefficient=iCoefficient.replaceAll(",","");
+                i2=20;
+                
+                frequencyAdditionReal[i]=frequencyTest(inputedWave);
+                inputedWave=inputedWave.replace("wt","");
+        real[frequencyAdditionReal[i]]=real[frequencyAdditionReal[i]]+eval(iCoefficient);
+        }
             }
+            }else{
+        frequencyAdditionReal[i]=frequencyTest(inputedWave);
+        inputedWave=inputedWave.replace("wt","");
+        real[frequencyAdditionReal[i]]=real[frequencyAdditionReal[i]]+1;
+        }
+    inputedWave=inputedWave.replace("cos","");
+        }
     }
+    }//級数のi列目終わり
 
 
 //i倍音の時の正弦、余弦の振幅数から波形を生成する。
 const periodicWave=audioCtx.createPeriodicWave(real, imag);
-
 oscillator.setPeriodicWave(periodicWave);
-oscillator.frequency.setValueAtTime(Hz*(2**(oct)), audioCtx.currentTime); // ヘルツ単位の値
+    oscillator.frequency.setValueAtTime((Hz)*(2**(oct)), audioCtx.currentTime);
 oscillator.connect(audioCtx.destination);
 oscillator.start();
 oscillator.stop(0.5);
