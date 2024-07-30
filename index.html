@@ -3,6 +3,19 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
         <title>オシレーター</title>
     </head>
+    <style>
+        #myMelody {
+            width:500;
+        }
+        .funnyButton{
+            width:500;
+            height:30;
+            }
+        .gray{
+            color:gray;
+            font-size:10px;
+            }
+    </style>
     <body>
         12音階
         <input type="button" value="4C" onclick="play(260.7)" id="C" />
@@ -28,7 +41,27 @@
         <input type="button" value="nまでの数列式を波形に変換する。" onclick="letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value)" /><br>
         <hr>
         特殊な設定<br>
-        再生中に周波数を増加させる。<input type="text" placeholder="例(0.5*t)" id="movement" />
+        拍数<input type="text" class="soundLength" oninput="changeSweepLength()" value="4" /><br>
+        加工<input type="checkbox" onclick="isSweep++;" />
+        <label for="attack">Attack</label>
+<input
+  name="attack"
+  id="attack"
+  type="range"
+  min="0"
+  max="2"
+  value="0.2"
+  step="0.1" />
+
+<label for="release">Release</label>
+<input
+  name="release"
+  id="release"
+  type="range"
+  min="0"
+  max="2"
+  value="0.5"
+  step="0.1" />
         <hr>
         プリセット<br>
         
@@ -36,6 +69,47 @@
         <input type="button" value="矩形波" onclick="document.getElementById('waveInput2').value='sin((2*i-1)wt)/(2*i-1)'; letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value);" />
         <input type="button" value="三角波" onclick="document.getElementById('waveInput2').value='sin((2*i-1)wt)/((2*i-1)**2)*((-1)**(i-1))';letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value);" />
         <input type="button" value="のこぎり波" onclick="document.getElementById('waveInput2').value='sin((i)wt)/(i)';letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value);" />
-        <script type="text/javascript" src="./oscillator.js"></script>
+        <hr>
+        順番に鳴らす。<br>
+        テンポ<input type="text" value="60" id="BPM" /><br>
+        <textarea name="t_name3" cols="25" rows="4" id="myMelody">play(tone(3),0,2),play(tone(5),2,2),play(tone(7),4,2)</textarea>
+        <br>
+        <input type="button" class="funnyButton" value="実行" onclick="perform(document.querySelector('#myMelody').value)" /><br>
+        構文
+        <div class="gray">
+        play(周波数(toneでもいい),何拍後に鳴らすか,何泊の間鳴らすか)<br>
+        tone(ピッチ,基準となる周波数(未設定で440HzまたはA4))<br>
+        chw(""で囲まれている設定したい波形,もし級数で入力しているならtrueと書く)途中で音色を変えるという使い方はできない。<br>
+        oscillation(アタック,リリース)これも何度も使えない<br>
+        setBPM(テンポ)これも
+        </div>
+        <input type="button" value="サンプル0" onclick="document.querySelector('#myMelody').value='\
+oscillation(0,0.75),\
+setBPM(100),\n\
+chw(\'sin((2*i-1)wt)/(2*i-1)\',true),\n\
+\
+play(tone(3),0,4),\
+play(tone(5),2,4),\
+play(tone(7),4,4),\
+play(tone(8),6,4),\
+play(tone(10),8,4),\
+play(tone(12),10,4),\
+play(tone(14),12,4),\
+play(tone(15),14,4);\
+    ';" />
+        <input type="button" value="サンプル1" onclick="document.querySelector('#myMelody').value='play(tone(3),0,1),play(tone(5),2,2),play(tone(7),4,4),\nplay(tone(-2),0,1),play(tone(2),2,2),play(tone(3),4,4)';" />
+        <input type="button" value="サンプル2" onclick="document.querySelector('#myMelody').value='setBPM(200),\nchw(\'sin((2*i-1)wt)/((2*i-1)**2)*((-1)**(i-1))\',true),\n\nplay(tone(7),0,2),play(tone(7),2,2),play(tone(7),6,2),play(tone(3),10,2),play(tone(7),12,2),play(tone(10),16,2),play(tone(-2),24,2)';" />
+        <input type="button" value="サンプル3" onclick="document.querySelector('#myMelody').value='\
+oscillation(0,0.75),\
+setBPM(100),\n\
+chw(\'sin((2*i-1)wt)/(2*i-1)\',true),\n\n\
+play(tone(8),0,1),play(tone(6),2,1),play(tone(8),4,1),play(tone(10),6,1),\n\
+play(tone(15),8,1),play(tone(13),10,1),play(tone(15),12,1),play(tone(10),14,1),\n\
+play(tone(5),16,1),play(tone(5),18,1),play(tone(6),19.5,0.5),play(tone(8),20,1),play(tone(3),21,1),play(tone(1),23,1)\n\
+    ';" />
+        <hr>
+        Midi(未実装)<input type=file id=loadFile accept=".mid,.midi,.kar" disabled />
+        <input id="position" type="range" min="0" max="100" value="0" disabled>
+        <script type="text/javascript" src="./Oscillator.js"></script>
     </body>
 </html>
