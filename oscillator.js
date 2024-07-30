@@ -14,11 +14,18 @@ const gs = document.getElementById("G#");
 const a = document.getElementById("A");
 const as = document.getElementById("A#");
 const b = document.getElementById("B");
+let sweepLength = 4;
 var seed=0;
 let oct=0;
 let maxIndex=100;
 
-function checkValue(str,value,type,modStr){
+var isSweep=0;
+
+function changeSweepLength(){
+    sweepLength=document.querySelector(".soundLength").value;
+    }
+
+function checkValue(str,value,type,modStr){    
     let loop=1;
     let strArray=[];
     if(type=="-"){
@@ -46,6 +53,8 @@ function checkValue(str,value,type,modStr){
     }
 
 function inputNumber(){
+
+    
     yourButton.value=yourFrequency.value*(2**(oct))+"Hz";
     c.value=parseInt(oct+4)+"C";
     cs.value=parseInt(oct+4)+"C#";
@@ -97,7 +106,17 @@ function frequencyTest(inputedWave){
                 return eval(i3Coefficient);
             }
 }
-function play(Hz){
+function play(Hz,time,duration){
+    if(!duration){
+        duration=(sweepLength*60)/(eval(document.querySelector("#BPM").value)*4);
+        }else{
+        duration=(duration*60)/(eval(document.querySelector("#BPM").value)*4);
+        }
+    if(!time){
+        time=0;
+        }else{
+        time=(time*60)/(eval(document.querySelector("#BPM").value)*4);
+        }
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const oscillator = audioCtx.createOscillator();
 //ユーザーが入力する値はフーリエ級数、i倍音の振幅数の大きさなどを読み取る。
@@ -169,8 +188,94 @@ if(valueSin+valueCos>=i){
 //i倍音の時の正弦、余弦の振幅数から波形を生成する。
 const periodicWave=audioCtx.createPeriodicWave(real, imag);
 oscillator.setPeriodicWave(periodicWave);
-    oscillator.frequency.setValueAtTime((Hz)*(2**(oct)), audioCtx.currentTime);
-oscillator.connect(audioCtx.destination);
-oscillator.start();
-oscillator.stop(0.5);
+oscillator.frequency.setValueAtTime((Hz)*(2**(oct)), audioCtx.currentTime);
+const sweepEnv = new GainNode(audioCtx);
+    if(isSweep%2==1){
+  sweepEnv.gain.cancelScheduledValues(time);
+  sweepEnv.gain.setValueAtTime(0, time);
+  sweepEnv.gain.linearRampToValueAtTime(1, time + attackTime);
+  sweepEnv.gain.linearRampToValueAtTime(0, time + duration - releaseTime);
+        }
+
+  oscillator.connect(sweepEnv).connect(audioCtx.destination);
+  oscillator.start(time);
+  oscillator.stop(time + duration);
+}
+
+let attackTime = 0.05;
+const attackControl = document.querySelector("#attack");
+attackControl.addEventListener(
+  "input",
+  (ev) => {
+    attackTime = (parseInt(ev.target.value, 10)*60)/(eval(document.querySelector("#BPM").value)*4);
+  },
+  false,
+);
+
+let releaseTime = 0.25;
+const releaseControl = document.querySelector("#release");
+releaseControl.addEventListener(
+  "input",
+  (ev) => {
+    releaseTime = (parseInt(ev.target.value, 10)*60)/(eval(document.querySelector("#BPM").value)*4);
+  },
+  false,
+);
+
+/*midi player from https://github.com/fraigo/javascript-midi-player*/
+/*
+	// create the player object using a file input by id or DOM Element
+	player=new MIDIPlayer('loadFile');
+	// register the onload function to start playing
+	player.onload = function(song){
+		player.play();
+		var pos= document.getElementById("position");
+		pos.setAttribute("max",song.duration);
+	}
+	// the tick event is triggered in every position change
+	player.ontick=function(song,position){
+		var pos= document.getElementById("position");
+		pos.value=position;
+	}
+	// stop playing when the window is unfocused
+	// resume playing when window is in focus
+	window.onfocus=function(){
+		console.log("Focus", new Date())
+		player.play();
+	}*/
+
+function tone(toneUp,Hz){
+    if(!Hz){
+        Hz=440;
+        }
+    if(!toneUp){
+        toneUp=0;
+        }
+    return Hz*Math.pow(2,toneUp/12);
+}
+
+function perform(note){
+    eval(note);
+}
+
+function chw(wave,type){
+    if(!type){
+        type=false;
+        }
+    if(type===true){
+        document.getElementById('waveInput2').value=wave;
+        letsConvert(document.getElementById('waveInput2').value,document.getElementById('makeWaveTo').value);
+    }else{
+        document.getElementById('waveInput').value=wave;
+    }
+}
+function oscillation(atk,rls){
+    isSweep=1;
+    document.querySelector("#attack").value=atk;
+    attackTime = (parseInt(atk, 10)*60)/(eval(document.querySelector("#BPM").value)*4);
+    document.querySelector("#release").value=rls;
+    releaseTime = (parseInt(rls, 10)*60)/(eval(document.querySelector("#BPM").value)*4);
+}
+function setBPM(BPM){
+    document.querySelector("#BPM").value=BPM;
 }
